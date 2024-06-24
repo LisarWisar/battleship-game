@@ -167,16 +167,25 @@ const Home = () => {
 	function UserFireAtTarget(xCoord, yCoord){    //Handles user firing at enemy positions
 
 		let tempTurnStatus = "";
-		if (!userFiredAtTiles.includes(Number(`${xCoord}${yCoord}`))){
+		let tempGameStatus = "active"
+		if (!userFiredAtTiles.includes(Number(`${xCoord}${yCoord}`))){ //checks if the user has already fired at that position
 			if (CheckIfValueIsInNestedArray(cpuBoats, Number(`${xCoord}${yCoord}`)) && turnStatus === "player turn"){
-				setCpuLifePoints(cpuLifePoints-1);
 				let tempFiredAtArr = userFiredAtTiles;
 				tempFiredAtArr.push(Number(`${xCoord}${yCoord}`));
 				setUserFiredAtTiles(tempFiredAtArr);
 				console.log("You hit a boat!");
+				
 				setTurnStatus("cpu turn");
 				tempTurnStatus = "cpu turn";
 				setCurrentlyTargeted([1,1]);
+
+				let tempCpuLifePoints = cpuLifePoints-1;
+				setCpuLifePoints(cpuLifePoints-1);
+				if(tempCpuLifePoints == 0){  //Checks if the game has finished
+					setGameStatus("inactive");
+					tempGameStatus = "inactive";
+					console.log("Congratulations! You've won the game!");
+				}
 			}
 			else if(gameStatus !== "active"){
 				console.log("Game hasn't started yet")
@@ -198,25 +207,31 @@ const Home = () => {
 			console.log("You already fired here, try another position!");
 		}
 
-		if(tempTurnStatus === "cpu turn"){
+		if(tempTurnStatus === "cpu turn" && tempGameStatus == "active"){
 			CpuFireAtTarget();
 		}
 	}
 
-	function CpuFireAtTarget (){
+	function CpuFireAtTarget (){ //handles CPU targeting and firing
 		let cpuFireCoords = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
 
-		while(cpuFiredAtTiles.includes(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`))){
+		while(cpuFiredAtTiles.includes(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`))){   //checks if the cpu has already fired at that position
 			cpuFireCoords = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
 		}
 
 		if (CheckIfValueIsInNestedArray(userBoats, `${cpuFireCoords[0]}${cpuFireCoords[1]}`)){
-			setPlayerLifePoints(playerLifePoints-1);
 			let tempFiredAtArr = cpuFiredAtTiles;
 			tempFiredAtArr.push(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`));
 			setCpuFiredAtTiles(tempFiredAtArr);
 			console.log("You've been hit!");
 			setTurnStatus("player turn");
+
+			let tempPlayerLifePoints = playerLifePoints-1;
+			setPlayerLifePoints(playerLifePoints-1);
+			if(tempPlayerLifePoints == 0){
+				setGameStatus("inactive");
+				console.log("Too bad! You've lost the game!");
+			}
 		}
 		else{
 			let tempFiredAtArr = cpuFiredAtTiles;
