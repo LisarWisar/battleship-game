@@ -165,6 +165,8 @@ const Home = () => {
 	}
 
 	function UserFireAtTarget(xCoord, yCoord){    //Handles user firing at enemy positions
+
+		let tempTurnStatus = "";
 		if (!userFiredAtTiles.includes(Number(`${xCoord}${yCoord}`))){
 			if (CheckIfValueIsInNestedArray(cpuBoats, Number(`${xCoord}${yCoord}`)) && turnStatus === "player turn"){
 				setCpuLifePoints(cpuLifePoints-1);
@@ -172,6 +174,8 @@ const Home = () => {
 				tempFiredAtArr.push(Number(`${xCoord}${yCoord}`));
 				setUserFiredAtTiles(tempFiredAtArr);
 				console.log("You hit a boat!");
+				setTurnStatus("cpu turn");
+				tempTurnStatus = "cpu turn";
 			}
 			else if(gameStatus !== "active"){
 				console.log("Game hasn't started yet")
@@ -184,10 +188,42 @@ const Home = () => {
 				tempFiredAtArr.push(Number(`${xCoord}${yCoord}`));
 				setUserFiredAtTiles(tempFiredAtArr);
 				console.log("You missed!");
+				setTurnStatus("cpu turn");
+				tempTurnStatus = "cpu turn"
 			}
 		}
 		else {
 			console.log("You already fired here, try another position!");
+		}
+
+		if(tempTurnStatus === "cpu turn"){
+			CpuFireAtTarget();
+		}
+	}
+
+	function CpuFireAtTarget (){
+		let cpuFireCoords = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
+
+		while(cpuFiredAtTiles.includes(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`))){
+			cpuFireCoords = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
+		}
+
+		console.log("fire coords: ",cpuFireCoords);
+
+		if (CheckIfValueIsInNestedArray(userBoats, Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`))){
+			setPlayerLifePoints(playerLifePoints-1);
+			let tempFiredAtArr = cpuFiredAtTiles;
+			tempFiredAtArr.push(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`));
+			setCpuFiredAtTiles(tempFiredAtArr);
+			console.log("You've been hit!");
+			setTurnStatus("player turn");
+		}
+		else{
+			let tempFiredAtArr = cpuFiredAtTiles;
+			tempFiredAtArr.push(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`));
+			setCpuFiredAtTiles(tempFiredAtArr);
+			console.log("The CPU missed!");
+			setTurnStatus("player turn");
 		}
 	}
 
@@ -301,12 +337,12 @@ const Home = () => {
 					<div>Your life points: {playerLifePoints}</div>
 					<div>CPU life points: {cpuLifePoints}</div>
 					<button onClick={() => {
+						if (Object.keys(userBoats).length == 5){
+							console.log("It's your turn!");
 							setPlayerLifePoints(15);
 							setCpuLifePoints(15);
 							setTurnStatus("player turn");
 							setGameStatus("active");
-						if (Object.keys(userBoats).length == 5){
-							console.log("It's your turn!");
 						}
 						else {
 							console.log("You need to place all your boats first");
