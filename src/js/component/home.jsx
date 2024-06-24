@@ -11,10 +11,22 @@ const Home = () => {
 	const [boat4, setBoat4] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [boat5, setBoat5] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [userBoats, setUserBoats] = useState({});
-	const [cpuBoats, setCpuBoats] = useState({});
+	const [cpuBoats, setCpuBoats] = useState({
+		1:[11],
+		2:[12,22],
+		3:[13,23,33],
+		4:[14,24,34,44],
+		5:[15,25,35,45,55]
+	});
 	const [boardColumns, setBoardColumns] = useState([]);
 	const [boardRows, setBoardRows] = useState([]);
 	const [numberOfBoats, setNumberOfBoats] = useState([1,2,3,4,5]);
+	const [playerLifePoints, setPlayerLifePoints] = useState();
+	const [cpuLifePoints, setCpuLifePoints] = useState();
+	const [gameStatus, setGameStatus] = useState("inactive");
+	const [turnStatus, setTurnStatus] = useState();
+	const [userFiredAtTiles, setUserFiredAtTiles] = useState([]);
+	const [cpuFiredAtTiles, setCpuFiredAtTiles] = useState([]);
 	const rowCoordinates = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 
 
@@ -23,7 +35,7 @@ const Home = () => {
 		defineRows();
       }, []);
 	
-	function defineColumns () {
+	function defineColumns () { //create array to be used in boat selection options
 		let tempArr = []
 		for (let i = 1; i <10; i++){
 			tempArr.push({name: i, value: i})
@@ -31,7 +43,7 @@ const Home = () => {
 		setBoardColumns(tempArr);
 	}
 
-	function defineRows () {
+	function defineRows () { //create array to be used in boat selection options
 		let tempArr = []
 		
 		for (let i = 1; i <10; i++){
@@ -41,11 +53,11 @@ const Home = () => {
 	}
 
 
-	function handleTargeting (xCoord, yCoord){
+	function handleTargeting (xCoord, yCoord){ //Handles which tile on the cpu board is being targeted
 		setCurrentlyTargeted([xCoord, yCoord]);
 	}
 
-	function addUserBoat (startingXCoord, startingYCoord, direction, size){
+	function addUserBoat (startingXCoord, startingYCoord, direction, size){ //Adds boats to user board
 		let newBoatCoordinates = [];
 		startingXCoord = Number(startingXCoord);
 		startingYCoord = Number(startingYCoord);
@@ -85,7 +97,13 @@ const Home = () => {
 		return "ok";
 	}
 
-	function CheckIfValueIsInNestedArray (obj, valueToFind){
+	function addCpuBoats () { //Hardcoded to test firing and turns, random selection will be added
+		let newCpuBoats = {
+			
+		};
+	}
+
+	function CheckIfValueIsInNestedArray (obj, valueToFind){ //Checks if a tile coordinates are in a given object of arrays
 		let result = false;
 		let objPosition = 0;
 		while(result === false && objPosition < Object.values(obj).length){
@@ -95,7 +113,7 @@ const Home = () => {
 		return result;
 	}
 
-	function saveBoatInput (name, value, boatNumber) {
+	function saveBoatInput (name, value, boatNumber) { //saves boat selection on change but doesnt automatically add it to the board
 		if(boatNumber == 1){
 			setBoat1((prevState => ({
 				...prevState,
@@ -128,7 +146,7 @@ const Home = () => {
 		}
 	}
 
-	function sendBoatInput (boatNumber){
+	function sendBoatInput (boatNumber){ //Saves boat data to be added
 		if(boatNumber == 1){
 			addUserBoat(boat1.column, boat1.row, boat1.direction, boatNumber);
 		}
@@ -143,6 +161,30 @@ const Home = () => {
 		}
 		else if (boatNumber == 5){
 			addUserBoat(boat5.column, boat5.row, boat5.direction, boatNumber);
+		}
+	}
+
+	function UserFireAtTarget(xCoord, yCoord){    //Handles user firing at enemy positions
+		if (!userFiredAtTiles.includes(Number(`${xCoord}${yCoord}`))){
+			if (CheckIfValueIsInNestedArray(cpuBoats, Number(`${xCoord}${yCoord}`)) && turnStatus === "player turn"){
+				setCpuLifePoints(cpuLifePoints-1);
+				let tempFiredAtArr = userFiredAtTiles;
+				tempFiredAtArr.push(Number(`${xCoord}${yCoord}`));
+				setUserFiredAtTiles(tempFiredAtArr);
+				console.log("You hit a boat!");
+			}
+			else if(gameStatus !== "player turn"){
+				console.log("It's not your turn");
+			}
+			else{
+				let tempFiredAtArr = userFiredAtTiles;
+				tempFiredAtArr.push(Number(`${xCoord}${yCoord}`));
+				setUserFiredAtTiles(tempFiredAtArr);
+				console.log("You missed!");
+			}
+		}
+		else {
+			console.log("You already fired here, try another position!");
 		}
 	}
 
@@ -242,12 +284,17 @@ const Home = () => {
 				</div>
 				<div className="weaponsControl">
 					<div>Currently targeted tile: {`${rowCoordinates[currentlyTargeted[1]-1]}${currentlyTargeted[0]}`}</div>
-					<button>Fire!</button>
+					<button onClick={()=> {
+						UserFireAtTarget(currentlyTargeted[0], currentlyTargeted[1]);
+					}}>Fire!</button>
 				</div>
 				<div className="gameStatus">
-					<div>Your points:</div>
-					<div>CPU points:</div>
+					<div>Your life points: {playerLifePoints}</div>
+					<div>CPU life points: {cpuLifePoints}</div>
 					<button onClick={() => {
+							setPlayerLifePoints(15);
+							setCpuLifePoints(15);
+							setTurnStatus("player turn");
 						if (Object.keys(userBoats).length == 5){
 							console.log("It's your turn!");
 						}
@@ -271,26 +318,26 @@ function CreateBoard () {
 		let tempArray = [];
 		for (let j = 0; j<11; j++){ //i is y coordinate
 			if ((i == 0 || i == 10) && (j == 0 || j == 10)){
-				tempArray.push({"posClass": "cornerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+				tempArray.push({"posClass": "cornerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "targeted": "notTargetedTile"});
 			}
 			else if((i == 0 || i == 10)){
 				if (j == 1){
-					tempArray.push({"posClass": "firstTopTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "firstTopTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "targeted": "notTargetedTile"});
 				}
 				else {
-					tempArray.push({"posClass": "topTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "topTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "targeted": "notTargetedTile"});
 				}
 			}
 			else if(j == 0 || j == 10){
 				if (i == 1){
-					tempArray.push({"posClass": "firstSideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "firstSideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "targeted": "notTargetedTile"});
 				}
 				else{
-					tempArray.push({"posClass": "sideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "sideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "targeted": "notTargetedTile"});
 				}
 			}
 			else {
-				tempArray.push({"posClass": "centerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+				tempArray.push({"posClass": "centerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "targeted": "notTargetedTile"});
 			}
 		}
 		newBoard.push(tempArray);
