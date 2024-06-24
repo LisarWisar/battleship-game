@@ -1,15 +1,27 @@
 /* General board layout */
 
+.mainScreen {
+    display: flex;
+}
+
+.cpuSide {
+    width: 30%;
+}
+
+.userSide {
+    width: 30%;
+}
+
 .gameBoard {
     display: flex;  
     flex-wrap: wrap;
-    width: 30%;
     margin: 40px;
 }
 
 .centerTile {
     width: 10%;
     aspect-ratio : 1 / 1;
+    border: 1px gray solid;
 }
 
 .sideTile {
@@ -37,6 +49,12 @@
 .cornerTile {
     width: 5%;
     aspect-ratio: 1 / 1;
+}
+
+/*Boat positioning*/
+
+.ocuppiedTile {
+    background-color: green;
 }
 
 /*Targeting and firing */
