@@ -11,13 +11,7 @@ const Home = () => {
 	const [boat4, setBoat4] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [boat5, setBoat5] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [userBoats, setUserBoats] = useState({});
-	const [cpuBoats, setCpuBoats] = useState({
-		1:[11],
-		2:[12,22],
-		3:[13,23,33],
-		4:[14,24,34,44],
-		5:[15,25,35,45,55]
-	});
+	const [cpuBoats, setCpuBoats] = useState({});
 	const [boardColumns, setBoardColumns] = useState([]);
 	const [boardRows, setBoardRows] = useState([]);
 	const [numberOfBoats, setNumberOfBoats] = useState([1,2,3,4,5]);
@@ -98,9 +92,41 @@ const Home = () => {
 	}
 
 	function addCpuBoats () { //Hardcoded to test firing and turns, random selection will be added
-		let newCpuBoats = {
-			
-		};
+		let possibleDirections = ["up", "right", "left", "down"];
+		let tempObj = {}
+		for (let i = 1; i < 6; i++){
+			let newCpuBoats = []
+			let boatIsCorrect = false;
+			while(!boatIsCorrect){
+				let newBoatCoordinates = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
+				let newBoatDirection = possibleDirections[Math.floor(Math.random() * 5)];
+				console.log(newBoatCoordinates);
+				console.log(newBoatDirection);
+				for (let j = 0; j < i; j++){
+					if(newBoatDirection === "up" && newBoatCoordinates[1] >= i){   //validates direction, prevents overflow from the board
+						newCpuBoats.push(Number(`${newBoatCoordinates[0]}${newBoatCoordinates[1] - j}`)); //add cordinates as XY instead of [X,Y] to avoid unnecesary array nesting
+						boatIsCorrect = true;
+					}
+					else if(newBoatDirection === "right" && (([newBoatCoordinates[0]]+i) <= 10)){
+						newCpuBoats.push(Number(`${newBoatCoordinates[0] + j}${newBoatCoordinates[1]}`));
+						boatIsCorrect = true;
+					}
+					else if(newBoatDirection === "down" && ((newBoatCoordinates[1]+i) <= 10)){
+						newCpuBoats.push(Number(`${newBoatCoordinates[0]}${newBoatCoordinates[1] + j}`));
+						boatIsCorrect = true;
+					}
+					else if(newBoatDirection === "left" && newBoatCoordinates[0] >= i){
+						newCpuBoats.push(Number(`${newBoatCoordinates[0] - j}${newBoatCoordinates[1]}`));
+						boatIsCorrect = true;
+					}
+				}
+			}
+			console.log("new coords: ", newCpuBoats);
+			console.log("size: ", i);
+			tempObj[i] = newCpuBoats;
+		}
+		setCpuBoats(tempObj);
+		return tempObj;
 	}
 
 	function CheckIfValueIsInNestedArray (obj, valueToFind){ //Checks if a tile coordinates are in a given object of arrays
@@ -359,12 +385,13 @@ const Home = () => {
 						<div>Your life points: {playerLifePoints}</div>
 						<div>CPU life points: {cpuLifePoints}</div>
 						<button onClick={() => {
-							if (Object.keys(userBoats).length == 5){
-								console.log("It's your turn!");
+							if (Object.keys(userBoats).length == 1){ //change to 5 after testing
+								addCpuBoats();
 								setPlayerLifePoints(15);
 								setCpuLifePoints(15);
 								setTurnStatus("player turn");
 								setGameStatus("active");
+								console.log("It's your turn!");
 							}
 							else {
 								console.log("You need to place all your boats first");
