@@ -100,8 +100,6 @@ const Home = () => {
 			while(!boatIsCorrect){
 				let newBoatCoordinates = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
 				let newBoatDirection = possibleDirections[Math.floor(Math.random() * 5)];
-				console.log(newBoatCoordinates);
-				console.log(newBoatDirection);
 				for (let j = 0; j < i; j++){
 					if(newBoatDirection === "up" && newBoatCoordinates[1] >= i){   //validates direction, prevents overflow from the board
 						newCpuBoats.push(Number(`${newBoatCoordinates[0]}${newBoatCoordinates[1] - j}`)); //add cordinates as XY instead of [X,Y] to avoid unnecesary array nesting
@@ -120,11 +118,21 @@ const Home = () => {
 						boatIsCorrect = true;
 					}
 				}
+				let tempCoords = newCpuBoats; //Prevents boat overlapping
+				let overlappingTiles = 0;
+				console.log(tempObj);
+				for (let k = 0; k < newCpuBoats.length; k++){
+					console.log(tempCoords[k]);
+					if(CheckIfValueIsInNestedArray(tempObj, tempCoords[k])){
+						overlappingTiles += 1;
+						console.log("Boats can't overlap");
+					}
+				}
+				console.log("tiles: ", overlappingTiles)
 			}
-			console.log("new coords: ", newCpuBoats);
-			console.log("size: ", i);
 			tempObj[i] = newCpuBoats;
 		}
+		console.log(tempObj) //borrar
 		setCpuBoats(tempObj);
 		return tempObj;
 	}
@@ -385,7 +393,7 @@ const Home = () => {
 						<div>Your life points: {playerLifePoints}</div>
 						<div>CPU life points: {cpuLifePoints}</div>
 						<button onClick={() => {
-							if (Object.keys(userBoats).length == 1){ //change to 5 after testing
+							if (Object.keys(userBoats).length == 1 && gameStatus === "inactive"){ //change to 5 after testing
 								addCpuBoats();
 								setPlayerLifePoints(15);
 								setCpuLifePoints(15);
