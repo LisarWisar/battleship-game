@@ -1,7 +1,13 @@
-/* General board layout */
+/* General layout */
 
 .mainScreen {
+    margin: 60px;
     display: flex;
+}
+.boardTitle {
+    text-align: center;
+    font-weight: 700;
+    font-size: 30px;
 }
 
 .cpuSide {
@@ -12,6 +18,12 @@
     width: 30%;
 }
 
+.controlPanelSide {
+    width: 30%;
+    border: 1px gray solid;
+}
+
+/* Board layout */
 .gameBoard {
     display: flex;  
     flex-wrap: wrap;
@@ -28,27 +40,58 @@
     width: 5%;
     border: gray solid;
     border-width: 0px 1px 1px 1px;
+    text-align: center;
+    font-weight: 500;
+    background-color: lightgray;
 }
 
 .firstSideTile {
     width: 5%;
     border: 1px gray solid;
+    text-align: center;
+    font-weight: 500;
+    background-color: lightgray;
 }
 
 .topTile {
     width: 10%;
     border: gray solid;
     border-width: 1px 1px 1px 0px;
+    text-align: center;
+    font-weight: 500;
+    background-color: lightgray;
 }
 
 .firstTopTile {
     width: 10%;
     border: 1px gray solid;
+    text-align: center;
+    font-weight: 500;
+    background-color: lightgray;
 }
 
 .cornerTile {
     width: 5%;
     aspect-ratio: 1 / 1;
+}
+
+/*Panel controls*/
+
+.boatsSelection {
+    font-size: 12px;
+    border-bottom: 1px gray solid;
+    padding: 5px 0px 5px 0px;
+}
+
+.boatTitle {
+    margin-left: 10px;
+}
+
+.boatDirectionSelection, .boatColumnSelection, .boatRowSelection {
+    margin: 0px 10px 0px 5px;
+}
+.boatDirectionLabel, .boatColumnLabel, .boatRowLabel {
+    margin: 0px 0px 0px 10px;
 }
 
 /*Boat positioning*/

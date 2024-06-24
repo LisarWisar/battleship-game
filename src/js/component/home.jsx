@@ -5,35 +5,75 @@ const Home = () => {
 	const [userBoard, setUserBoard] = useState(CreateBoard());
 	const [cpuBoard, setCpuBoard] = useState(CreateBoard());
 	const [currentlyTargeted , setCurrentlyTargeted] = useState([0,0]);
+	const [boat1, setBoat1] = useState({"column": 1, "row": 1, "direction": "up"});
+	const [boat2, setBoat2] = useState({"column": 1, "row": 1, "direction": "up"});
+	const [boat3, setBoat3] = useState({"column": 1, "row": 1, "direction": "up"});
+	const [boat4, setBoat4] = useState({"column": 1, "row": 1, "direction": "up"});
+	const [boat5, setBoat5] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [userBoats, setUserBoats] = useState({});
 	const [cpuBoats, setCpuBoats] = useState({});
+	const [boardColumns, setBoardColumns] = useState([{},{},{},{},{}]);
+	const [boardRows, setBoardRows] = useState([]);
+	const [numberOfBoats, setNumberOfBoats] = useState([1,2,3,4,5]);
 
 	useEffect(() => {
-        addBoat(5,4,"up", 3);
+        defineColumns();
+		defineRows();
       }, []);
+	
+	function defineColumns () {
+		let tempArr = []
+		for (let i = 1; i <10; i++){
+			tempArr.push({name: i, value: i})
+		}
+		setBoardColumns(tempArr);
+	}
+
+	function defineRows () {
+		let tempArr = []
+		const rowCoordinates = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+		for (let i = 1; i <10; i++){
+			tempArr.push({name: rowCoordinates[i-1], value: i})
+		}
+		setBoardRows(tempArr);
+	}
 
 
 	function handleTargeting (xCoord, yCoord){
 		setCurrentlyTargeted([xCoord, yCoord]);
 	}
 
-	function addBoat (startingXCoord, startingYCoord, direction, size){
+	function addUserBoat (startingXCoord, startingYCoord, direction, size){
 		let newBoatCoordinates = [];
+		startingXCoord = Number(startingXCoord);
+		startingYCoord = Number(startingYCoord);
+
 		for (let i = 0; i < size; i++){
-			if(direction === "up" && startingYCoord >= size && !CheckIfValueIsInNestedArray(userBoats, `${startingXCoord}${startingYCoord - i}`)){   //validates direction, prevents overflow from the board, and prevents boat overlapping
+			if(direction === "up" && startingYCoord >= size){   //validates direction, prevents overflow from the board
 				newBoatCoordinates.push(`${startingXCoord}${startingYCoord - i}`); //add cordinates as XY instead of [X,Y] to avoid unnecesary array nesting
 			}
-			else if(direction === "right" && ((startingXCoord+size) <= 9) && !CheckIfValueIsInNestedArray(userBoats, `${startingXCoord+i}${startingYCoord}`)){
+			else if(direction === "right" && ((startingXCoord+size) <= 10)){
 				newBoatCoordinates.push(`${startingXCoord + i}${startingYCoord}`);
 			}
-			else if(direction === "down" && ((startingYCoord+size) <= 9) && !CheckIfValueIsInNestedArray(userBoats, `${startingXCoord}${startingYCoord+i}`)){
+			else if(direction === "down" && ((startingYCoord+size) <= 10)){
 				newBoatCoordinates.push(`${startingXCoord}${startingYCoord + i}`);
 			}
-			else if(direction === "left" && startingXCoord >= size && !CheckIfValueIsInNestedArray(userBoats, `${startingXCoord-i}${startingYCoord}`)){
+			else if(direction === "left" && startingXCoord >= size){
 				newBoatCoordinates.push(`${startingXCoord - i}${startingYCoord}`);
 			}
 			else {
+				console.log("Can't place a boat out of bounds");
 				return ("not ok");
+			}
+		}
+		
+		let tempCoords = newBoatCoordinates; //Prevents boat overlapping
+		for (let i = 0; i < newBoatCoordinates.length; i++){
+			console.log(userBoats);
+			console.log(tempCoords);
+			if(CheckIfValueIsInNestedArray(userBoats, tempCoords[i])){
+				newBoatCoordinates = []
+				console.log("Boats can't overlap");
 			}
 		}
 
@@ -54,9 +94,61 @@ const Home = () => {
 		return result;
 	}
 
+	function saveBoatInput (name, value, boatNumber) {
+		if(boatNumber == 1){
+			setBoat1((prevState => ({
+				...prevState,
+				[name]: value
+			})));
+		}
+		else if (boatNumber == 2){
+			setBoat2((prevState => ({
+				...prevState,
+				[name]: value
+			})));
+		}
+		else if (boatNumber == 3){
+			setBoat3((prevState => ({
+				...prevState,
+				[name]: value
+			})));
+		}
+		else if (boatNumber == 4){
+			setBoat4((prevState => ({
+				...prevState,
+				[name]: value
+			})));
+		}
+		else if (boatNumber == 5){
+			setBoat5((prevState => ({
+				...prevState,
+				[name]: value
+			})));
+		}
+	}
+
+	function sendBoatInput (boatNumber){
+		if(boatNumber == 1){
+			addUserBoat(boat1.column, boat1.row, boat1.direction, boatNumber);
+		}
+		else if (boatNumber == 2){
+			addUserBoat(boat2.column, boat2.row, boat2.direction, boatNumber);
+		}
+		else if (boatNumber == 3){
+			addUserBoat(boat3.column, boat3.row, boat3.direction, boatNumber);
+		}
+		else if (boatNumber == 4){
+			addUserBoat(boat4.column, boat4.row, boat4.direction, boatNumber);
+		}
+		else if (boatNumber == 5){
+			addUserBoat(boat5.column, boat5.row, boat5.direction, boatNumber);
+		}
+	}
+
 	return (
 		<div className="mainScreen">
 			<div className="cpuSide">
+				<div className="boardTitle">CPU Board</div>
 				<div className="gameBoard">
 					{cpuBoard.map(boardColumn => (
 						boardColumn.map(tile => {
@@ -81,6 +173,7 @@ const Home = () => {
 				</div>
 			</div>
 			<div className="userSide">
+				<div className="boardTitle">Your Board</div>
 				<div className="gameBoard">
 					{userBoard.map(boardColumn => (
 						boardColumn.map(tile => {
@@ -103,6 +196,50 @@ const Home = () => {
 					))}
 				</div>
 			</div>
+			<div className="controlPanelSide">
+				<div>
+					{numberOfBoats.map(boatNumber => (
+						<div className="boatsSelection">
+						<div className="boatTitle">Boat {boatNumber}</div>
+						<label for="boat1" className="boatDirectionLabel">Direction</label>
+						<select name="direction" id="boat1" className="boatDirectionSelection" 
+						onChange={(e => {
+							saveBoatInput(e.target.name, e.target.value, boatNumber);
+						})}>
+							<option value="up">Up</option>
+							<option value="down">Down</option>
+							<option value="left">Left</option>
+							<option value="right">Right</option>
+						</select>
+						<label for="boat1" className="boatColumnLabel">Column</label>
+						<select name="column" id="boat1" className="boatColumnSelection"
+						onChange={(e => {
+							saveBoatInput(e.target.name, e.target.value, boatNumber);
+						})}>
+							{boardColumns.map(column => {
+								return(
+									<option value={column.value}>{column.name}</option>
+								)
+							})}
+						</select>
+						<label for="boat1" className="boatRowLabel">Row</label>
+						<select name="row" id="boat1" className="boatRowSelection"
+						onChange={(e => {
+							saveBoatInput(e.target.name, e.target.value, boatNumber);
+						})}>
+							{boardRows.map(column => {
+								return(
+									<option value={column.value}>{column.name}</option>
+								)
+							})}
+						</select>
+						<button onClick={() =>{
+							sendBoatInput(boatNumber);
+						}}>Create</button>
+					</div>	
+					))}
+				</div>
+			</div>
 		</div>
 	);
 };
@@ -117,26 +254,26 @@ function CreateBoard () {
 		let tempArray = [];
 		for (let j = 0; j<11; j++){ //i is y coordinate
 			if ((i == 0 || i == 10) && (j == 0 || j == 10)){
-				tempArray.push({"key": `${i}${j}`, "posClass": "cornerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+				tempArray.push({"posClass": "cornerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
 			}
 			else if((i == 0 || i == 10)){
 				if (j == 1){
-					tempArray.push({"key": `${i}${j}`,"posClass": "firstTopTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "firstTopTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
 				}
 				else {
-					tempArray.push({"key": `${i}${j}`,"posClass": "topTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "topTile", "xCoordinate": j, "yCoordinate": i, "tileText": j, "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
 				}
 			}
 			else if(j == 0 || j == 10){
 				if (i == 1){
-					tempArray.push({"key": `${i}${j}`,"posClass": "firstSideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "firstSideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
 				}
 				else{
-					tempArray.push({"key": `${i}${j}`,"posClass": "sideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+					tempArray.push({"posClass": "sideTile", "xCoordinate": j, "yCoordinate": i, "tileText": sideCoordinates[i-1], "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
 				}
 			}
 			else {
-				tempArray.push({"key": `${i}${j}`,"posClass": "centerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
+				tempArray.push({"posClass": "centerTile", "xCoordinate": j, "yCoordinate": i, "tileText": "", "ocuppied": false, "targeted": "notTargetedTile", "wasShotAt": false});
 			}
 		}
 		newBoard.push(tempArray);
