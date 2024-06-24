@@ -75,7 +75,7 @@
     aspect-ratio: 1 / 1;
 }
 
-/*Panel controls*/
+/*Control panel*/
 
 .boatsSelection {
     font-size: 12px;
@@ -92,6 +92,15 @@
 }
 .boatDirectionLabel, .boatColumnLabel, .boatRowLabel {
     margin: 0px 0px 0px 10px;
+}
+
+.weaponsControl {
+    padding: 10px;
+    border-bottom: 1px gray solid;
+}
+
+.gameStatus {
+    padding: 10px;
 }
 
 /*Boat positioning*/

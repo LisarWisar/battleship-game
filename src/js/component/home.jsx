@@ -4,7 +4,7 @@ const Home = () => {
 
 	const [userBoard, setUserBoard] = useState(CreateBoard());
 	const [cpuBoard, setCpuBoard] = useState(CreateBoard());
-	const [currentlyTargeted , setCurrentlyTargeted] = useState([0,0]);
+	const [currentlyTargeted , setCurrentlyTargeted] = useState([1,1]);
 	const [boat1, setBoat1] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [boat2, setBoat2] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [boat3, setBoat3] = useState({"column": 1, "row": 1, "direction": "up"});
@@ -12,9 +12,11 @@ const Home = () => {
 	const [boat5, setBoat5] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [userBoats, setUserBoats] = useState({});
 	const [cpuBoats, setCpuBoats] = useState({});
-	const [boardColumns, setBoardColumns] = useState([{},{},{},{},{}]);
+	const [boardColumns, setBoardColumns] = useState([]);
 	const [boardRows, setBoardRows] = useState([]);
 	const [numberOfBoats, setNumberOfBoats] = useState([1,2,3,4,5]);
+	const rowCoordinates = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+
 
 	useEffect(() => {
         defineColumns();
@@ -31,7 +33,7 @@ const Home = () => {
 
 	function defineRows () {
 		let tempArr = []
-		const rowCoordinates = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+		
 		for (let i = 1; i <10; i++){
 			tempArr.push({name: rowCoordinates[i-1], value: i})
 		}
@@ -69,18 +71,17 @@ const Home = () => {
 		
 		let tempCoords = newBoatCoordinates; //Prevents boat overlapping
 		for (let i = 0; i < newBoatCoordinates.length; i++){
-			console.log(userBoats);
-			console.log(tempCoords);
 			if(CheckIfValueIsInNestedArray(userBoats, tempCoords[i])){
 				newBoatCoordinates = []
 				console.log("Boats can't overlap");
 			}
 		}
-
-		setUserBoats(prevState => ({
-			...prevState,
-			[size]: newBoatCoordinates //uses size as id as both are unique and the same in this game
-		}));
+		if (newBoatCoordinates.length != 0){
+			setUserBoats(prevState => ({
+				...prevState,
+				[size]: newBoatCoordinates //uses size as id as both are unique and the same in this game
+			}));
+		}
 		return "ok";
 	}
 
@@ -238,6 +239,22 @@ const Home = () => {
 						}}>Create</button>
 					</div>	
 					))}
+				</div>
+				<div className="weaponsControl">
+					<div>Currently targeted tile: {`${rowCoordinates[currentlyTargeted[1]-1]}${currentlyTargeted[0]}`}</div>
+					<button>Fire!</button>
+				</div>
+				<div className="gameStatus">
+					<div>Your points:</div>
+					<div>CPU points:</div>
+					<button onClick={() => {
+						if (Object.keys(userBoats).length == 5){
+							console.log("It's your turn!");
+						}
+						else {
+							console.log("You need to place all your boats first");
+						}
+					}}>Start game</button>
 				</div>
 			</div>
 		</div>
