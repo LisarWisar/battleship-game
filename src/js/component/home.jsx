@@ -11,7 +11,13 @@ const Home = () => {
 	const [boat4, setBoat4] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [boat5, setBoat5] = useState({"column": 1, "row": 1, "direction": "up"});
 	const [userBoats, setUserBoats] = useState({});
-	const [cpuBoats, setCpuBoats] = useState({});
+	const [cpuBoats, setCpuBoats] = useState({
+		1:[12],
+		2:[42,43],
+		3:[18,28,38],
+		4:[85,86,87,88],
+		5:[51,61,71,81,91]
+	})
 	const [boardColumns, setBoardColumns] = useState([]);
 	const [boardRows, setBoardRows] = useState([]);
 	const [numberOfBoats, setNumberOfBoats] = useState([1,2,3,4,5]);
@@ -393,8 +399,8 @@ const Home = () => {
 						<div>Your life points: {playerLifePoints}</div>
 						<div>CPU life points: {cpuLifePoints}</div>
 						<button onClick={() => {
-							if (Object.keys(userBoats).length == 1 && gameStatus === "inactive"){ //change to 5 after testing
-								addCpuBoats();
+							if (Object.keys(userBoats).length == 5 && gameStatus === "inactive"){ //change to 5 after testing
+								/*addCpuBoats(); not currenctly functional, boats tend to overlap*/
 								setPlayerLifePoints(15);
 								setCpuLifePoints(15);
 								setTurnStatus("player turn");
