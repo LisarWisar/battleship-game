@@ -119,3 +119,10 @@
     border: 1px gray solid;
 }
 
+.boatHit {
+    background-color: red;
+}
+
+.waterHit {
+    background-color: lightblue;
+}

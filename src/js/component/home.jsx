@@ -173,7 +173,10 @@ const Home = () => {
 				setUserFiredAtTiles(tempFiredAtArr);
 				console.log("You hit a boat!");
 			}
-			else if(gameStatus !== "player turn"){
+			else if(gameStatus !== "active"){
+				console.log("Game hasn't started yet")
+			}
+			else if(turnStatus !== "player turn"){
 				console.log("It's not your turn");
 			}
 			else{
@@ -200,8 +203,14 @@ const Home = () => {
 									<div 
 										className={`
 											${tile.posClass} 
-											${(tile.xCoordinate == currentlyTargeted[0] && tile.yCoordinate == currentlyTargeted[1]) ? "targetedTile" : "notTargetedTile"}`
-										}
+											${(tile.xCoordinate == currentlyTargeted[0] && tile.yCoordinate == currentlyTargeted[1]) ? "targetedTile" : "notTargetedTile"}
+											${userFiredAtTiles.includes(Number(`${tile.xCoordinate}${tile.yCoordinate}`))
+											? CheckIfValueIsInNestedArray(cpuBoats, Number(`${tile.xCoordinate}${tile.yCoordinate}`))
+												? "boatHit"
+												: "waterHit"
+											: ""	
+											}
+										`}
 										onClick={() => handleTargeting(tile.xCoordinate, tile.yCoordinate)}
 									></div>
 								)
@@ -295,6 +304,7 @@ const Home = () => {
 							setPlayerLifePoints(15);
 							setCpuLifePoints(15);
 							setTurnStatus("player turn");
+							setGameStatus("active");
 						if (Object.keys(userBoats).length == 5){
 							console.log("It's your turn!");
 						}
