@@ -23,6 +23,16 @@
     border: 1px gray solid;
 }
 
+.instructionsBox{
+    border: 1px gray solid;
+    margin: 10px;
+    padding: 10px;
+}
+
+.warningText{
+    color: red;
+}
+
 /* Board layout */
 .gameBoard {
     display: flex;  

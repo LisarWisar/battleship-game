@@ -243,133 +243,157 @@ const Home = () => {
 	}
 
 	return (
-		<div className="mainScreen">
-			<div className="cpuSide">
-				<div className="boardTitle">CPU Board</div>
-				<div className="gameBoard">
-					{cpuBoard.map(boardColumn => (
-						boardColumn.map(tile => {
-							if (tile.posClass === "centerTile"){
-								return(
-									<div 
-										className={`
-											${tile.posClass} 
-											${(tile.xCoordinate == currentlyTargeted[0] && tile.yCoordinate == currentlyTargeted[1]) ? "targetedTile" : "notTargetedTile"}
-											${userFiredAtTiles.includes(Number(`${tile.xCoordinate}${tile.yCoordinate}`))
-											? CheckIfValueIsInNestedArray(cpuBoats, Number(`${tile.xCoordinate}${tile.yCoordinate}`))
-												? "boatHit"
-												: "waterHit"
-											: ""	
-											}
-										`}
-										onClick={() => handleTargeting(tile.xCoordinate, tile.yCoordinate)}
-									></div>
-								)
+		<div>
+			<div className="mainScreen">
+				<div className="cpuSide">
+					<div className="boardTitle">CPU Board</div>
+					<div className="gameBoard">
+						{cpuBoard.map(boardColumn => (
+							boardColumn.map(tile => {
+								if (tile.posClass === "centerTile"){
+									return(
+										<div 
+											className={`
+												${tile.posClass} 
+												${(tile.xCoordinate == currentlyTargeted[0] && tile.yCoordinate == currentlyTargeted[1]) ? "targetedTile" : "notTargetedTile"}
+												${userFiredAtTiles.includes(Number(`${tile.xCoordinate}${tile.yCoordinate}`))
+												? CheckIfValueIsInNestedArray(cpuBoats, Number(`${tile.xCoordinate}${tile.yCoordinate}`))
+													? "boatHit"
+													: "waterHit"
+												: ""	
+												}
+											`}
+											onClick={() => handleTargeting(tile.xCoordinate, tile.yCoordinate)}
+										></div>
+									)
+								}
+								else{
+									return(
+										<div className={tile.posClass}>{tile.tileText}</div>
+									)
+								}
+							})
+						))}
+					</div>
+				</div>
+				<div className="userSide">
+					<div className="boardTitle">Your Board</div>
+					<div className="gameBoard">
+						{userBoard.map(boardColumn => (
+							boardColumn.map(tile => {
+								if (tile.posClass === "centerTile"){
+									return(
+										<div 
+											className={`
+												${tile.posClass}
+												${CheckIfValueIsInNestedArray(userBoats, `${tile.xCoordinate}${tile.yCoordinate}`) ? "ocuppiedTile" : ""}
+												${cpuFiredAtTiles.includes(Number(`${tile.xCoordinate}${tile.yCoordinate}`))
+												? CheckIfValueIsInNestedArray(userBoats, `${tile.xCoordinate}${tile.yCoordinate}`)
+													? "boatHit"
+													: "waterHit"
+												: ""
+												}
+											`}
+										></div>
+									)
+								}
+								else{
+									return(
+										<div className={tile.posClass}>{tile.tileText}</div>
+									)
+								}
+							})
+						))}
+					</div>
+				</div>
+				<div className="controlPanelSide">
+					<div>
+						{numberOfBoats.map(boatNumber => (
+							<div className="boatsSelection">
+							<div className="boatTitle">Boat {boatNumber}</div>
+							<label for="boat1" className="boatDirectionLabel">Direction</label>
+							<select name="direction" id="boat1" className="boatDirectionSelection" 
+							onChange={(e => {
+								saveBoatInput(e.target.name, e.target.value, boatNumber);
+							})}>
+								<option value="up">Up</option>
+								<option value="down">Down</option>
+								<option value="left">Left</option>
+								<option value="right">Right</option>
+							</select>
+							<label for="boat1" className="boatColumnLabel">Column</label>
+							<select name="column" id="boat1" className="boatColumnSelection"
+							onChange={(e => {
+								saveBoatInput(e.target.name, e.target.value, boatNumber);
+							})}>
+								{boardColumns.map(column => {
+									return(
+										<option value={column.value}>{column.name}</option>
+									)
+								})}
+							</select>
+							<label for="boat1" className="boatRowLabel">Row</label>
+							<select name="row" id="boat1" className="boatRowSelection"
+							onChange={(e => {
+								saveBoatInput(e.target.name, e.target.value, boatNumber);
+							})}>
+								{boardRows.map(column => {
+									return(
+										<option value={column.value}>{column.name}</option>
+									)
+								})}
+							</select>
+							<button onClick={() =>{
+								sendBoatInput(boatNumber);
+							}}>Create</button>
+						</div>	
+						))}
+					</div>
+					<div className="weaponsControl">
+						<div>Currently targeted tile: {`${rowCoordinates[currentlyTargeted[1]-1]}${currentlyTargeted[0]}`}</div>
+						<button onClick={()=> {
+							UserFireAtTarget(currentlyTargeted[0], currentlyTargeted[1]);
+						}}>Fire!</button>
+					</div>
+					<div className="gameStatus">
+						<div>Your life points: {playerLifePoints}</div>
+						<div>CPU life points: {cpuLifePoints}</div>
+						<button onClick={() => {
+							if (Object.keys(userBoats).length == 5){
+								console.log("It's your turn!");
+								setPlayerLifePoints(15);
+								setCpuLifePoints(15);
+								setTurnStatus("player turn");
+								setGameStatus("active");
 							}
-							else{
-								return(
-									<div className={tile.posClass}>{tile.tileText}</div>
-								)
+							else {
+								console.log("You need to place all your boats first");
 							}
-						})
-					))}
+						}}>Start game</button>
+					</div>
 				</div>
 			</div>
-			<div className="userSide">
-				<div className="boardTitle">Your Board</div>
-				<div className="gameBoard">
-					{userBoard.map(boardColumn => (
-						boardColumn.map(tile => {
-							if (tile.posClass === "centerTile"){
-								return(
-									<div 
-										className={`
-											${tile.posClass}
-											${CheckIfValueIsInNestedArray(userBoats, `${tile.xCoordinate}${tile.yCoordinate}`) ? "ocuppiedTile" : ""}
-											${cpuFiredAtTiles.includes(Number(`${tile.xCoordinate}${tile.yCoordinate}`))
-											? CheckIfValueIsInNestedArray(userBoats, `${tile.xCoordinate}${tile.yCoordinate}`)
-												? "boatHit"
-												: "waterHit"
-											: ""
-											}
-										`}
-									></div>
-								)
-							}
-							else{
-								return(
-									<div className={tile.posClass}>{tile.tileText}</div>
-								)
-							}
-						})
-					))}
-				</div>
-			</div>
-			<div className="controlPanelSide">
-				<div>
-					{numberOfBoats.map(boatNumber => (
-						<div className="boatsSelection">
-						<div className="boatTitle">Boat {boatNumber}</div>
-						<label for="boat1" className="boatDirectionLabel">Direction</label>
-						<select name="direction" id="boat1" className="boatDirectionSelection" 
-						onChange={(e => {
-							saveBoatInput(e.target.name, e.target.value, boatNumber);
-						})}>
-							<option value="up">Up</option>
-							<option value="down">Down</option>
-							<option value="left">Left</option>
-							<option value="right">Right</option>
-						</select>
-						<label for="boat1" className="boatColumnLabel">Column</label>
-						<select name="column" id="boat1" className="boatColumnSelection"
-						onChange={(e => {
-							saveBoatInput(e.target.name, e.target.value, boatNumber);
-						})}>
-							{boardColumns.map(column => {
-								return(
-									<option value={column.value}>{column.name}</option>
-								)
-							})}
-						</select>
-						<label for="boat1" className="boatRowLabel">Row</label>
-						<select name="row" id="boat1" className="boatRowSelection"
-						onChange={(e => {
-							saveBoatInput(e.target.name, e.target.value, boatNumber);
-						})}>
-							{boardRows.map(column => {
-								return(
-									<option value={column.value}>{column.name}</option>
-								)
-							})}
-						</select>
-						<button onClick={() =>{
-							sendBoatInput(boatNumber);
-						}}>Create</button>
-					</div>	
-					))}
-				</div>
-				<div className="weaponsControl">
-					<div>Currently targeted tile: {`${rowCoordinates[currentlyTargeted[1]-1]}${currentlyTargeted[0]}`}</div>
-					<button onClick={()=> {
-						UserFireAtTarget(currentlyTargeted[0], currentlyTargeted[1]);
-					}}>Fire!</button>
-				</div>
-				<div className="gameStatus">
-					<div>Your life points: {playerLifePoints}</div>
-					<div>CPU life points: {cpuLifePoints}</div>
-					<button onClick={() => {
-						if (Object.keys(userBoats).length == 5){
-							console.log("It's your turn!");
-							setPlayerLifePoints(15);
-							setCpuLifePoints(15);
-							setTurnStatus("player turn");
-							setGameStatus("active");
-						}
-						else {
-							console.log("You need to place all your boats first");
-						}
-					}}>Start game</button>
-				</div>
+			<div className="instructionsBox">
+				<h5 className="warningText">Important! Must read before playing!</h5>
+				<h2>Instructions</h2>
+				<h4>Before the game starts:</h4>
+				<ol>
+					<li>Place your 5 ships on the board, each ship has a size equal to it's number. So ship 1 has a length of 1 tile, ship 2 has a length of 2, and so on.</li>
+					<li>Be aware that ships can't overlap and they can't be placed out of the bounds of the board.</li>
+					<li>Once all your ships are positioned, click on the "Start game" button to start.</li>
+				</ol>
+				<h4>How to play:</h4>
+				<ol>
+					<li>Select a tile on the cpu board where you want to fire by click on it, once you've done that click on the "Fire!" button to shoot. Be aware that you can't shoot again on a tile you previously fire on.</li>
+					<li>If your shot hit an enemy ship, that tile will be colored red and the cpu will lose 1 life point. And if your shot missed, it will turn light blue. A message will also be displayed on the console telling you if you missed or not.</li>
+					<li>After you fire the cpu will immediately shoot back. If one of your boats get hit, that tile will turn red and you will lose 1 life point, otherwhise, the tile will turn light-blue.</li>
+					<li>After the cpu shoots, it will be your turn and you can fire again.</li>
+				</ol>
+				<h4>Important notes:</h4>
+				<ul>
+					<li>It's highly recommended to have the console open while playing, as all important information regarding the game status will be displayed there.</li>
+					<li>The cpu currently aims randomly, so it does not take previous shots into consideration when deciding where to fire.</li>
+				</ul>
 			</div>
 		</div>
 	);
