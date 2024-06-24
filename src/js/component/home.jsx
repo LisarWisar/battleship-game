@@ -176,6 +176,7 @@ const Home = () => {
 				console.log("You hit a boat!");
 				setTurnStatus("cpu turn");
 				tempTurnStatus = "cpu turn";
+				setCurrentlyTargeted([1,1]);
 			}
 			else if(gameStatus !== "active"){
 				console.log("Game hasn't started yet")
@@ -190,6 +191,7 @@ const Home = () => {
 				console.log("You missed!");
 				setTurnStatus("cpu turn");
 				tempTurnStatus = "cpu turn"
+				setCurrentlyTargeted([1,1]);
 			}
 		}
 		else {
@@ -207,10 +209,6 @@ const Home = () => {
 		while(cpuFiredAtTiles.includes(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`))){
 			cpuFireCoords = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
 		}
-
-		console.log("fire coords: ", Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`));
-		console.log(userBoats);
-		console.log(CheckIfValueIsInNestedArray(userBoats, `${cpuFireCoords[0]}${cpuFireCoords[1]}`));
 
 		if (CheckIfValueIsInNestedArray(userBoats, `${cpuFireCoords[0]}${cpuFireCoords[1]}`)){
 			setPlayerLifePoints(playerLifePoints-1);
@@ -273,6 +271,12 @@ const Home = () => {
 										className={`
 											${tile.posClass}
 											${CheckIfValueIsInNestedArray(userBoats, `${tile.xCoordinate}${tile.yCoordinate}`) ? "ocuppiedTile" : ""}
+											${cpuFiredAtTiles.includes(Number(`${tile.xCoordinate}${tile.yCoordinate}`))
+											? CheckIfValueIsInNestedArray(userBoats, `${tile.xCoordinate}${tile.yCoordinate}`)
+												? "boatHit"
+												: "waterHit"
+											: ""
+											}
 										`}
 									></div>
 								)
