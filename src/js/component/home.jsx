@@ -208,9 +208,11 @@ const Home = () => {
 			cpuFireCoords = [Math.floor(Math.random() * 9) +1, Math.floor(Math.random() * 9)+1];
 		}
 
-		console.log("fire coords: ",cpuFireCoords);
+		console.log("fire coords: ", Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`));
+		console.log(userBoats);
+		console.log(CheckIfValueIsInNestedArray(userBoats, `${cpuFireCoords[0]}${cpuFireCoords[1]}`));
 
-		if (CheckIfValueIsInNestedArray(userBoats, Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`))){
+		if (CheckIfValueIsInNestedArray(userBoats, `${cpuFireCoords[0]}${cpuFireCoords[1]}`)){
 			setPlayerLifePoints(playerLifePoints-1);
 			let tempFiredAtArr = cpuFiredAtTiles;
 			tempFiredAtArr.push(Number(`${cpuFireCoords[0]}${cpuFireCoords[1]}`));
